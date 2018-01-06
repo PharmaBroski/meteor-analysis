@@ -4,11 +4,11 @@ This repository contains scripts designed to analyze .mp4 footage and detect met
 
 ## Screenshots
 
-<img width="1004" alt="meteor1" src="https://user-images.githubusercontent.com/27097476/34637687-b861b7de-f278-11e7-8f5e-690601abf417.png">
+<img width="400" alt="meteor1" src="https://user-images.githubusercontent.com/27097476/34637687-b861b7de-f278-11e7-8f5e-690601abf417.png">
 
-<img width="999" alt="meteor2" src="https://user-images.githubusercontent.com/27097476/34637688-bc017186-f278-11e7-88b4-cf4723e6dfad.png">
+<img width="400" alt="meteor2" src="https://user-images.githubusercontent.com/27097476/34637688-bc017186-f278-11e7-88b4-cf4723e6dfad.png">
 
-<img width="995" alt="meteor3" src="https://user-images.githubusercontent.com/27097476/34637689-bebe669a-f278-11e7-8025-3a2677e7d03b.png">
+<img width="400" alt="meteor3" src="https://user-images.githubusercontent.com/27097476/34637689-bebe669a-f278-11e7-8025-3a2677e7d03b.png">
 
 ## Getting Started
 
