@@ -1,8 +1,11 @@
 ## Motion detection & Tracking using Python and OpenCV
 #python motion_detector.py --video videos/
 # python motion_detector.py --video test-files/rendered.mp4
+# python motion_detector.py --video ../hiddengithub/test-files/rendered.mp4
 # Dependencies/Packages
 
+import numpy as np #screenshots
+import pyautogui #screenshots
 import argparse
 import datetime
 import imutils
@@ -10,7 +13,8 @@ import time
 import cv2
 
 
-framesize = 900;
+screenshotNumber = 0
+framesize = 900
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-v", "--video", help="/test-files") #path to video file? I included full path including file. Unsure if this is correct
@@ -97,12 +101,20 @@ while True:
 		firstFrame = gray
 		print("Grayed the frame")
 
+	if text == "Detected":
+		screenshotNumber+=1
+		if frameNumber %20 == 0:
+			pyautogui.screenshot(str(screenshotNumber) + "movement.png")
+			image = cv2.imread("/detected-images/" + str(screenshotNumber) + "movement.png")
+
+
+
 
 	cv2.putText(frame, "Frame Count: {}".format(frameNumber), (240, 20),
 		cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 	# show the frame and record if the user presses a key
-	cv2.imshow("Feed", frame)
-	# cv2.imshow("Thresh", thresh)
+	# cv2.imshow("Feed", frame)
+	cv2.imshow("Thresh", thresh)
 	# cv2.imshow("Thresh2", thresh2)
 	# cv2.imshow("Frame Delta", frameDelta)
 	key = cv2.waitKey(1) & 0xFF
@@ -114,3 +126,16 @@ while True:
 # cleanup the camera and close any open windows
 camera.release()
 cv2.destroyAllWindows()
+
+
+
+
+
+# Screenshot notes
+#  with OpenCV and PythonShell
+#
+# $ workon dl4cv
+# $ pip install pillow imutils
+# $ pip install pyobjc-core
+# $ pip install pyobjc
+# $ pip install pyautogui
