@@ -42,4 +42,4 @@ See also the list of [contributors](https://github.com/PharmaBroski/meteor-analy
 
 ## Acknowledgments
 
-* Huge thanks to pyimagesearch.com and Mr. Adrian Rosbrock for amazing tutorial blog posts on the topic of motion detection in machine vision.
+* Huge thanks to pyimagesearch.com and Mr. Adrian Rosebrock for amazing tutorial blog posts on the topic of motion detection in machine vision.
