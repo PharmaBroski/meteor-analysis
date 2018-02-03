@@ -6,10 +6,10 @@
 
 import numpy as np #screenshots
 import pyautogui #screenshots
-import argparse
-import datetime
-import imutils
-import time
+import argparse	#terminal commands
+import datetime #timestamp
+import imutils #video funcitons
+import time #time
 import cv2
 
 
@@ -19,7 +19,7 @@ framesize = 900
 ap = argparse.ArgumentParser()
 ap.add_argument("-v", "--video", help="/test-files") #path to video file? I included full path including file. Unsure if this is correct
 # Min area is a region in pixels for a region of image to be considered motion
-ap.add_argument("-a", "--min-area", type=int, default=framesize/40, help="minimum area size")
+ap.add_argument("-a", "--min-area", type=int, default=framesize/400, help="minimum area size")
 args = vars(ap.parse_args())
 
 # if the video argument is None, then we are reading from webcam
@@ -99,22 +99,21 @@ while True:
 		savedFrame = frameNumber
 		# if(text == "Not Detected"):
 		firstFrame = gray
-		print("Grayed the frame")
 
 	if text == "Detected":
 		screenshotNumber+=1
 		if frameNumber %20 == 0:
 			pyautogui.screenshot(str(screenshotNumber) + "movement.png")
-			image = cv2.imread("/detected-images/" + str(screenshotNumber) + "movement.png")
-
+			# image = cv2.imread("detected_images/" + str(screenshotNumber) + "movement.png")
+			image = cv2.imwrite("test.png", img)
 
 
 
 	cv2.putText(frame, "Frame Count: {}".format(frameNumber), (240, 20),
 		cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 	# show the frame and record if the user presses a key
-	# cv2.imshow("Feed", frame)
-	cv2.imshow("Thresh", thresh)
+	cv2.imshow("Feed", frame)
+	# cv2.imshow("Thresh", thresh)
 	# cv2.imshow("Thresh2", thresh2)
 	# cv2.imshow("Frame Delta", frameDelta)
 	key = cv2.waitKey(1) & 0xFF
