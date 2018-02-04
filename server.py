@@ -39,10 +39,10 @@ except socket.error as e:
 socket.listen(5)
 print('Waiting for a connection.')
 
-
+status = 0 #this status variable keeps track of what's running. This variable is not threaded since it must be the same for every client	
 
 def threaded_client(conn):
-	status = 0 #this status variable keeps track of what's running. This variable is not threaded since it must be the same for every client	
+	global status	
 	ref = 0 #this ref variable keeps track of the user's progress through the terminal interface	
     #REF INDEX
     #0 = PASSWORD NOT INPUTTED
@@ -70,7 +70,7 @@ def threaded_client(conn):
 		#	IF THE USER TYPES IN 'help' INTO THE TERMINAL, A SERIES OF COMMANDS AND THEIR FUNCTIONS WILL BE DISPLAYED
 		#	THE HELP SCREEN CAN ONLY BE ACCESSED IF THE USER DOES NOT
 		if data == b'help\r\n' and ref != 0:
-			reply = bcolors.HEADER + "SERVER: The following commands are available for your use:\n"	+bcolors.WARNING + "        start-detector: starts motion detector on host machine\n        stop-detector: terminates running motion detector\n" + bcolors.ENDC
+			reply = bcolors.HEADER + "SERVER: The following commands are available for your use:\n"	+bcolors.WARNING + "        start-detector: starts motion detector on host machine\n        stop-detector: terminates running motion detector\n        status: reports the status of the various available systems\n" + bcolors.ENDC
 
 		#EXIT HANDLING
 		#	IF THE USER TYPES 'exit' THEIR SESSION WILL END.
@@ -80,22 +80,29 @@ def threaded_client(conn):
 
 		#RUN MOTION DETECTOR FROM TERMINAL
 		#	IF THIS COMMAND IS USED, THE MOTION DETECTOR CAN REMOTELY BE TURNED ON AND OFF.
+		if data == b'start-detector\r\n' and status == 1:
+			reply = bcolors.FAIL + "SERVER: Motion detector is already running\n" + bcolors.ENDC
+
 		if data == b'start-detector\r\n' and status == 0:
 			reply = bcolors.HEADER + "SERVER: Starting motion detector\n" + bcolors.ENDC
 			theproc = subprocess.Popen([sys.executable, "motion_detector.py"])
 			status = 1
-		if data == b'start-detector\r\n' and status == 1:
-			reply = bcolors.FAIL + "SERVER: Motion detector running\n" + bcolors.ENDC
-
 		#STOP MOTION DETECTOR
+		if data == b'stop-detector\r\n' and status == 0:
+			reply = bcolors.FAIL + "SERVER: Can not stop detector since it is not running\n" + bcolors.ENDC
 		if data == b'stop-detector\r\n' and status == 1:
 			reply = bcolors.HEADER + "SERVER: Stopping motion detector\n" + bcolors.ENDC
 			theproc.kill()
 			status = 0
-		if data == b'stop-detector\r\n' and status == 0:
-			reply = bcolors.FAIL + "SERVER: Motion detector not running\n" + bcolors.ENDC
-
-
+		
+		#STATUS CHECKING
+		#	THIS COMMAND CAN BE USED TO CHECK THE STATUS OF THE VARIOUS SYSTEMS
+		if data == b'status\r\n' and ref != 0:
+			#status of the motion detector
+			if status == 0:
+				reply = bcolors.WARNING + "SERVER STATUS: \nMotion Detector: OFF\n" + bcolors.ENDC
+			if status == 1:
+				reply = bcolors.WARNING + "SERVER STATUS: \nMotion Detector: ON\n" + bcolors.ENDC
 
 
 		if not data:
