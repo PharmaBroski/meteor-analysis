@@ -105,7 +105,7 @@ while True:
 		if frameNumber %20 == 0:
 			pyautogui.screenshot(str(screenshotNumber) + "movement.png")
 			# image = cv2.imread("detected_images/" + str(screenshotNumber) + "movement.png")
-			image = cv2.imwrite("test.png", img)
+			# image = cv2.imwrite("test.png", img)
 
 
 

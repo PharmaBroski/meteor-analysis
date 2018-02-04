@@ -2,6 +2,20 @@ import socket
 import sys
 from _thread import *
 
+
+
+#BCOLORS CLASS
+#	THIS CLASS IS HERE IN ORDER TO ADD COLOUR TO THE TEXT IN TERMINAL
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    TITLE = '\070[540m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 host = ''
 port = 5555
 socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -17,28 +31,29 @@ socket.listen(5)
 print('Waiting for a connection.')
 def threaded_client(conn):
 	ref = 0 #this ref variable keeps track of the user's progress through the terminal interface
-	conn.send(str.encode('Welcome, to proceed please enter your password\nPassword: '))
+	conn.send(str.encode(bcolors.WARNING + bcolors.BOLD + bcolors.UNDERLINE + 'SKYCAM\n'+ bcolors.ENDC))
+	conn.send(str.encode(bcolors.HEADER + 'Welcome. To proceed please enter your password.'+ bcolors.ENDC+'\nPassword: '))
 
 	while True:
 		data = conn.recv(2048) #2048 is buffer rate
-		reply = "Command not recognized. Type 'help' if you need assistance\n"
+		reply = bcolors.FAIL + "SERVER: Command not recognized. Type 'help' if you need assistance\n" + bcolors.ENDC
 
 		#PASSWORD PROTECTION#
 		#	ONCE A USER CONNECTS TO THE SERVER, THEY WILL BE PROMPTED TO ENTER IN A PASSWORD.
 		#	THE USER CAN ONLY ACCESS FEATURES ONCE THE CORRECT PASSWORD IS ENTERED
 		if data == b'research\r\n' and ref == 0: #(utf-8 encoding)
-			reply = "SERVER: You now have access to this server. Type 'help' for assistance or 'exit' to end this session\n"
+			reply = bcolors.HEADER + "SERVER: You now have access to this server. Type 'help' for assistance or 'exit' to end this session\n" + bcolors.ENDC
 			ref = 1
 		if data != b'research\r\n' and ref == 0: #(utf-8 encoding)
 			#if password is incorrect
-			reply = "SERVER: Password incorrect.\nPassword: "
+			reply = bcolors.FAIL + "SERVER: Password incorrect. " + bcolors.ENDC + "\nPassword: "
 			ref = 0
 
 		#HELP HANDLING
 		#	IF THE USER TYPES IN 'help' INTO THE TERMINAL, A SERIES OF COMMANDS AND THEIR FUNCTIONS WILL BE DISPLAYED
 		#	THE HELP SCREEN CAN ONLY BE ACCESSED IF THE USER DOES NOT
 		if data == b'help\r\n' and ref != 0:
-			reply = "SERVER: The following commands are available for your use:\n	start-detector:		can be entered to start the motion detector on the host machine\n"
+			reply = bcolors.HEADER + "SERVER: The following commands are available for your use:\n	start-detector: can be entered to start the motion detector on the host machine\n" + bcolors.ENDC
 
 		#EXIT HANDLING
 		#	IF THE USER TYPES 'exit' THEIR SESSION WILL END.
