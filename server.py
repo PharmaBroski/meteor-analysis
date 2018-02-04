@@ -16,13 +16,12 @@ except socket.error as e:
 socket.listen(5)
 print('Waiting for a connection.')
 def threaded_client(conn):
-
 	ref = 0 #this ref variable keeps track of the user's progress through the terminal interface
 	conn.send(str.encode('Welcome, to proceed please enter your password\nPassword: '))
 
 	while True:
 		data = conn.recv(2048) #2048 is buffer rate
-		reply = data.decode('utf-8')
+		reply = "Command not recognized. Type 'help' if you need assistance\n"
 
 		#PASSWORD PROTECTION#
 		#	ONCE A USER CONNECTS TO THE SERVER, THEY WILL BE PROMPTED TO ENTER IN A PASSWORD.
@@ -32,20 +31,25 @@ def threaded_client(conn):
 			ref = 1
 		if data != b'research\r\n' and ref == 0: #(utf-8 encoding)
 			#if password is incorrect
-			reply = "SERVER: Password incorrect.\n"
+			reply = "SERVER: Password incorrect.\nPassword: "
 			ref = 0
 
 		#HELP HANDLING
 		#	IF THE USER TYPES IN 'help' INTO THE TERMINAL, A SERIES OF COMMANDS AND THEIR FUNCTIONS WILL BE DISPLAYED
 		#	THE HELP SCREEN CAN ONLY BE ACCESSED IF THE USER DOES NOT
 		if data == b'help\r\n' and ref != 0:
-			reply = "SERVER: HELP STILL BEING BUILT\n"
+			reply = "SERVER: The following commands are available for your use:\n	start-detector:		can be entered to start the motion detector on the host machine\n"
 
 		#EXIT HANDLING
 		#	IF THE USER TYPES 'exit' THEIR SESSION WILL END.
 		if data == b'exit\r\n': #(utf-8 encoding)
 			reply = "SERVER: Session ending\n"
 			conn.close()
+
+		#RUN MOTION DETECTOR FROM TERMINAL
+		if data == b'start-detector\r\n' and ref != 0:
+			reply = "SERVER: Starting motion detector\n"
+			exec(open('motion_detector.py').read())
 
 
 		if not data:
