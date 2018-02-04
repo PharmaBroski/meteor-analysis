@@ -100,10 +100,10 @@ while True:
 		# if(text == "Not Detected"):
 		firstFrame = gray
 
-	if text == "Detected":
-		screenshotNumber+=1
-		if frameNumber %20 == 0:
-			pyautogui.screenshot(str(screenshotNumber) + "movement.png")
+	# if text == "Detected":
+		# screenshotNumber+=1
+		# if frameNumber %20 == 0:
+			# pyautogui.screenshot(str(screenshotNumber) + "movement.png")
 			# image = cv2.imread("detected_images/" + str(screenshotNumber) + "movement.png")
 			# image = cv2.imwrite("test.png", img)
 

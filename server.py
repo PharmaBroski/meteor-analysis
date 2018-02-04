@@ -1,7 +1,9 @@
 import socket
 import sys
 from _thread import *
-
+import motion_detector_method
+import os
+import subprocess
 
 
 #BCOLORS CLASS
@@ -63,8 +65,19 @@ def threaded_client(conn):
 
 		#RUN MOTION DETECTOR FROM TERMINAL
 		if data == b'start-detector\r\n' and ref != 0:
-			reply = "SERVER: Starting motion detector\n"
-			exec(open('motion_detector.py').read())
+			reply = bcolors.HEADER + "SERVER: Starting motion detector\n" + bcolors.ENDC
+			conn.sendall(str.encode(reply))
+			# os.system("python motion_detector.py")
+			# subprocess.Popen("python3 motion_detector.py")
+			# subprocess.call(["python"], ["motion_detector.py"])
+			theproc = subprocess.Popen([sys.executable, "motion_detector.py"])
+
+		#STOP MOTION DETECTOR
+		if data == b'stop-detector\r\n' and ref != 0:
+			reply = bcolors.HEADER + "SERVER: Stopping motion detector\n" + bcolors.ENDC
+			theproc.kill()
+
+
 
 
 		if not data:
