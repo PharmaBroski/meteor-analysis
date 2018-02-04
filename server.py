@@ -1,7 +1,7 @@
 import socket
 import sys
 from _thread import *
-import motion_detector_method
+# import motion_detector
 import os
 import subprocess
 
@@ -49,7 +49,7 @@ def threaded_client(conn):
     #1 = PASSWORD INPUTTED
 
 	conn.send(str.encode(bcolors.WARNING + bcolors.BOLD + bcolors.UNDERLINE + 'SKYCAM\n'+ bcolors.ENDC))
-	conn.send(str.encode(bcolors.HEADER + 'Welcome. To proceed please enter your password. Status variable is set to '+str(status)+ bcolors.ENDC+'\nPassword: '))
+	conn.send(str.encode(bcolors.HEADER + 'Welcome. To proceed please enter your password.'+ bcolors.ENDC+'\nPassword: '))
 
 	while True:
 		data = conn.recv(2048) #2048 is buffer rate
@@ -70,7 +70,7 @@ def threaded_client(conn):
 		#	IF THE USER TYPES IN 'help' INTO THE TERMINAL, A SERIES OF COMMANDS AND THEIR FUNCTIONS WILL BE DISPLAYED
 		#	THE HELP SCREEN CAN ONLY BE ACCESSED IF THE USER DOES NOT
 		if data == b'help\r\n' and ref != 0:
-			reply = bcolors.HEADER + "SERVER: The following commands are available for your use:\n"	+bcolors.WARNING + "        start-detector: starts motion detector on host machine\n        stop-detector: terminates running motion detector\n        status: reports the status of the various available systems\n" + bcolors.ENDC
+			reply = bcolors.HEADER + "SERVER: The following commands are available for your use:\n"	+bcolors.WARNING + "        start-detector: starts motion detector on host machine\n        stop-detector: terminates running motion detector\n        status: displays the status of the various available systems\n" + bcolors.ENDC
 
 		#EXIT HANDLING
 		#	IF THE USER TYPES 'exit' THEIR SESSION WILL END.
@@ -85,11 +85,13 @@ def threaded_client(conn):
 
 		if data == b'start-detector\r\n' and status == 0:
 			reply = bcolors.HEADER + "SERVER: Starting motion detector\n" + bcolors.ENDC
+			global theproc #theproc variable must be made public incase the detector is turned off from a thread that it was not started from
 			theproc = subprocess.Popen([sys.executable, "motion_detector.py"])
 			status = 1
 		#STOP MOTION DETECTOR
 		if data == b'stop-detector\r\n' and status == 0:
-			reply = bcolors.FAIL + "SERVER: Can not stop detector since it is not running\n" + bcolors.ENDC
+			reply = bcolors.FAIL + "SERVER: Can not stop motion detector since it is not running\n" + bcolors.ENDC
+		
 		if data == b'stop-detector\r\n' and status == 1:
 			reply = bcolors.HEADER + "SERVER: Stopping motion detector\n" + bcolors.ENDC
 			theproc.kill()
@@ -104,6 +106,9 @@ def threaded_client(conn):
 			if status == 1:
 				reply = bcolors.WARNING + "SERVER STATUS: \nMotion Detector: ON\n" + bcolors.ENDC
 
+		#SCREENSHOTTING ENABLE/DISABLE
+		if data == b'scon\r\n' and ref != 0:
+			motion_detector.screenshotEnabled = 1
 
 		if not data:
 			break
