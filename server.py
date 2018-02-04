@@ -24,6 +24,13 @@ socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 
 
+
+
+
+#STATUS INDEX
+#0 = camera not running
+#1 = camera is running
+
 try:
 	socket.bind((host, port))
 except socket.error as e:
@@ -31,15 +38,18 @@ except socket.error as e:
 
 socket.listen(5)
 print('Waiting for a connection.')
+
+
+
 def threaded_client(conn):
-	ref = 0 #this ref variable keeps track of the user's progress through the terminal interface
+	status = 0 #this status variable keeps track of what's running. This variable is not threaded since it must be the same for every client	
+	ref = 0 #this ref variable keeps track of the user's progress through the terminal interface	
     #REF INDEX
     #0 = PASSWORD NOT INPUTTED
-    #1 = PASSWORD INPUTTED, CAMERA OFF
-    #2 = PASSWORD INUTTED, CAMERA ON
-    
+    #1 = PASSWORD INPUTTED
+
 	conn.send(str.encode(bcolors.WARNING + bcolors.BOLD + bcolors.UNDERLINE + 'SKYCAM\n'+ bcolors.ENDC))
-	conn.send(str.encode(bcolors.HEADER + 'Welcome. To proceed please enter your password.'+ bcolors.ENDC+'\nPassword: '))
+	conn.send(str.encode(bcolors.HEADER + 'Welcome. To proceed please enter your password. Status variable is set to '+str(status)+ bcolors.ENDC+'\nPassword: '))
 
 	while True:
 		data = conn.recv(2048) #2048 is buffer rate
@@ -70,21 +80,19 @@ def threaded_client(conn):
 
 		#RUN MOTION DETECTOR FROM TERMINAL
 		#	IF THIS COMMAND IS USED, THE MOTION DETECTOR CAN REMOTELY BE TURNED ON AND OFF.
-		if data == b'start-detector\r\n' and ref == 1:
-			conn.sendall(str.encode(bcolors.HEADER + "SERVER: Starting motion detector\n" + bcolors.ENDC)) 
+		if data == b'start-detector\r\n' and status == 0:
+			reply = bcolors.HEADER + "SERVER: Starting motion detector\n" + bcolors.ENDC
 			theproc = subprocess.Popen([sys.executable, "motion_detector.py"])
-			ref = 2 #ref changed to camera running
-
-		if data == b'start-detector\r\n' and ref == 2:
+			status = 1
+		if data == b'start-detector\r\n' and status == 1:
 			reply = bcolors.FAIL + "SERVER: Motion detector running\n" + bcolors.ENDC
-        
+
 		#STOP MOTION DETECTOR
-		if data == b'stop-detector\r\n' and ref == 2:
+		if data == b'stop-detector\r\n' and status == 1:
 			reply = bcolors.HEADER + "SERVER: Stopping motion detector\n" + bcolors.ENDC
 			theproc.kill()
-			ref = 1 #ref changed to camera off
-
-		if data == b'stop-detector\r\n' and ref == 1:
+			status = 0
+		if data == b'stop-detector\r\n' and status == 0:
 			reply = bcolors.FAIL + "SERVER: Motion detector not running\n" + bcolors.ENDC
 
 
