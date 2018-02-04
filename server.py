@@ -64,12 +64,10 @@ def threaded_client(conn):
 			conn.close()
 
 		#RUN MOTION DETECTOR FROM TERMINAL
+		#	IF THIS COMMAND IS USED, THE MOTION DETECTOR CAN REMOTELY BE TURNED ON AND OFF. 
 		if data == b'start-detector\r\n' and ref != 0:
 			reply = bcolors.HEADER + "SERVER: Starting motion detector\n" + bcolors.ENDC
 			conn.sendall(str.encode(reply))
-			# os.system("python motion_detector.py")
-			# subprocess.Popen("python3 motion_detector.py")
-			# subprocess.call(["python"], ["motion_detector.py"])
 			theproc = subprocess.Popen([sys.executable, "motion_detector.py"])
 
 		#STOP MOTION DETECTOR
