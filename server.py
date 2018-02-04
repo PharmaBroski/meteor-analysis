@@ -33,12 +33,18 @@ socket.listen(5)
 print('Waiting for a connection.')
 def threaded_client(conn):
 	ref = 0 #this ref variable keeps track of the user's progress through the terminal interface
+    #REF INDEX
+    #0 = PASSWORD NOT INPUTTED
+    #1 = PASSWORD INPUTTED
+    #3 = ?
+    #421 = CAMERA ON
+    #420 = CAMERA OFF
 	conn.send(str.encode(bcolors.WARNING + bcolors.BOLD + bcolors.UNDERLINE + 'SKYCAM\n'+ bcolors.ENDC))
 	conn.send(str.encode(bcolors.HEADER + 'Welcome. To proceed please enter your password.'+ bcolors.ENDC+'\nPassword: '))
 
 	while True:
 		data = conn.recv(2048) #2048 is buffer rate
-		reply = bcolors.FAIL + "SERVER: Command not recognized. Type 'help' if you need assistance\n" + bcolors.ENDC
+		reply = bcolors.FAIL + "SERVER: Command not recognized. Type 'help' for a list of commands\n" + bcolors.ENDC
 
 		#PASSWORD PROTECTION#
 		#	ONCE A USER CONNECTS TO THE SERVER, THEY WILL BE PROMPTED TO ENTER IN A PASSWORD.
@@ -55,7 +61,7 @@ def threaded_client(conn):
 		#	IF THE USER TYPES IN 'help' INTO THE TERMINAL, A SERIES OF COMMANDS AND THEIR FUNCTIONS WILL BE DISPLAYED
 		#	THE HELP SCREEN CAN ONLY BE ACCESSED IF THE USER DOES NOT
 		if data == b'help\r\n' and ref != 0:
-			reply = bcolors.HEADER + "SERVER: The following commands are available for your use:\n	start-detector: can be entered to start the motion detector on the host machine\n" + bcolors.ENDC
+			reply = bcolors.HEADER + "SERVER: The following commands are available for your use:\n"	+bcolors.WARNING + "        start-detector: can be entered to start the motion detector on the host machine\n        stop-detector: to terminate running motion detector\n" + bcolors.ENDC
 
 		#EXIT HANDLING
 		#	IF THE USER TYPES 'exit' THEIR SESSION WILL END.
@@ -64,12 +70,11 @@ def threaded_client(conn):
 			conn.close()
 
 		#RUN MOTION DETECTOR FROM TERMINAL
-		#	IF THIS COMMAND IS USED, THE MOTION DETECTOR CAN REMOTELY BE TURNED ON AND OFF. 
-		if data == b'start-detector\r\n' and ref != 0:
+		#	IF THIS COMMAND IS USED, THE MOTION DETECTOR CAN REMOTELY BE TURNED ON AND OFF.
+		if data == b'start-detector\r\n' and ref == 420:
 			reply = bcolors.HEADER + "SERVER: Starting motion detector\n" + bcolors.ENDC
-			conn.sendall(str.encode(reply))
 			theproc = subprocess.Popen([sys.executable, "motion_detector.py"])
-
+        
 		#STOP MOTION DETECTOR
 		if data == b'stop-detector\r\n' and ref != 0:
 			reply = bcolors.HEADER + "SERVER: Stopping motion detector\n" + bcolors.ENDC
