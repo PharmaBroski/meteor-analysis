@@ -12,7 +12,9 @@ import imutils #video funcitons
 import time #time
 import cv2
 
-screenshotEnabled = 1
+settingsFileRead = open("settings.txt", "r")
+screenshotEnabled = settingsFileRead.read(1)
+print("screenshot enabled is " + str(screenshotEnabled))
 screenshotNumber = 0
 framesize = 900
 # construct the argument parser and parse the arguments
@@ -105,16 +107,16 @@ while True:
 			screenshotNumber+=1
 			if frameNumber %10 == 0:
 				pyautogui.screenshot("detected_images/" + str(screenshotNumber) + "movement.png")
-				# image = cv2.imread("./detected_images/" + str(screenshotNumber) + "movement.png")
+				image = cv2.imread("./detected_images/" + str(screenshotNumber) + "movement.png")
 
 
 
 	cv2.putText(frame, "Frame Count: {}".format(frameNumber), (240, 20),
 		cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 	# show the frame and record if the user presses a key
-	cv2.imshow("Feed", frame)
-	# cv2.imshow("Thresh", thresh)
-	# cv2.imshow("Thresh2", thresh2)
+	# cv2.imshow("Feed", frame)
+	cv2.imshow("Thresh", thresh)
+	cv2.imshow("Thresh2", thresh2)
 	# cv2.imshow("Frame Delta", frameDelta)
 	key = cv2.waitKey(1) & 0xFF
 

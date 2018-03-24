@@ -39,11 +39,16 @@ except socket.error as e:
 socket.listen(5)
 print('Waiting for a connection.')
 
-status = 0 #this status variable keeps track of what's running. This variable is not threaded since it must be the same for every client	
+detector_status = 0 #this status variable keeps track of the motion detector. 0 = off 1 = on
+
+settingsFileRead = open("settings.txt", "r")
+screenshot_status = settingsFileRead.read(1) #reads the contents of the settings file (0 = off and 1 = on) the 1 in the parameters specifies to read only one character in the text file
 
 def threaded_client(conn):
-	global status	
-	ref = 0 #this ref variable keeps track of the user's progress through the terminal interface	
+	global detector_status
+	global screenshot_status
+	print(screenshot_status)
+	ref = 0 #this ref variable keeps track of the user's progress through the terminal interface
     #REF INDEX
     #0 = PASSWORD NOT INPUTTED
     #1 = PASSWORD INPUTTED
@@ -80,35 +85,61 @@ def threaded_client(conn):
 
 		#RUN MOTION DETECTOR FROM TERMINAL
 		#	IF THIS COMMAND IS USED, THE MOTION DETECTOR CAN REMOTELY BE TURNED ON AND OFF.
-		if data == b'start-detector\r\n' and status == 1:
+		if data == b'start-detector\r\n' and detector_status == 1:
 			reply = bcolors.FAIL + "SERVER: Motion detector is already running\n" + bcolors.ENDC
 
-		if data == b'start-detector\r\n' and status == 0:
+		if data == b'start-detector\r\n' and detector_status == 0:
 			reply = bcolors.HEADER + "SERVER: Starting motion detector\n" + bcolors.ENDC
 			global theproc #theproc variable must be made public incase the detector is turned off from a thread that it was not started from
 			theproc = subprocess.Popen([sys.executable, "motion_detector.py"])
-			status = 1
+			detector_status = 1
 		#STOP MOTION DETECTOR
-		if data == b'stop-detector\r\n' and status == 0:
+		if data == b'stop-detector\r\n' and detector_status == 0:
 			reply = bcolors.FAIL + "SERVER: Can not stop motion detector since it is not running\n" + bcolors.ENDC
-		
-		if data == b'stop-detector\r\n' and status == 1:
+
+		if data == b'stop-detector\r\n' and detector_status == 1:
 			reply = bcolors.HEADER + "SERVER: Stopping motion detector\n" + bcolors.ENDC
 			theproc.kill()
-			status = 0
-		
+			detector_status = 0
+
 		#STATUS CHECKING
 		#	THIS COMMAND CAN BE USED TO CHECK THE STATUS OF THE VARIOUS SYSTEMS
 		if data == b'status\r\n' and ref != 0:
 			#status of the motion detector
-			if status == 0:
+			
+
+
+			if detector_status == 0:
 				reply = bcolors.WARNING + "SERVER STATUS: \nMotion Detector: OFF\n" + bcolors.ENDC
-			if status == 1:
+				if screenshot_status == 0:
+					reply = bcolors.WARNING + "SERVER STATUS: \nMotion Detector: OFF\nScreenshotting Movement: " + bcolors.ENDC
+			if detector_status == 1:
 				reply = bcolors.WARNING + "SERVER STATUS: \nMotion Detector: ON\n" + bcolors.ENDC
 
+
+
 		#SCREENSHOTTING ENABLE/DISABLE
+		#
+		#ENABLE
+		# if data == b'scon\r\n' and ref != 0 and detector_status == 0:
+			# reply = bcolors.HEADER + "SERVER: Unable to execute command. Motion detector must be running to enable screenshotting\n"
+		# if data == b'scon\r\n' and ref != 0 and screenshot_status == 1:
+			# reply = bcolors.HEADER + "SERVER: Unable to execute command. Screenshotting is already enabled\n"
 		if data == b'scon\r\n' and ref != 0:
-			motion_detector.screenshotEnabled = 1
+			settingsFileWrite = open("settings.txt", "w")
+			settingsFileWrite.write("1")
+			settingsFileWrite.close()
+			reply = bcolors.HEADER + "SERVER: Screenshotting motion is turned on\n" + bcolors.ENDC
+			screenshot_status = 1
+		#DISABLE
+		# if data == b'scoff\r\n' and ref != 0 and detector_status == 0:
+			# reply = bcolors.HEADER + "SERVER: Unable to execute command. Motion detector must be running to disable screenshotting\n"
+		if data == b'scoff\r\n' and ref != 0:
+			settingsFileWrite = open("settings.txt", "w")
+			settingsFileWrite.write("0")
+			settingsFileWrite.close()
+			reply = bcolors.HEADER + "SERVER: Screenshotting motion has been turned off\n" + bcolors.ENDC
+			screenshot_status = 0
 
 		if not data:
 			break
