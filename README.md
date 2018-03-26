@@ -28,7 +28,11 @@ Or if you'd like to run this script live with your webcam (not supported very we
 python motion_detector.py
 ```
 ## Python Server (server.py)
-This is a python socket server which can easily be connected to using Telnet TCP. I wrote this to have easier access to the meteor-detecting camera. As of now, the server can grab the status of the camera, and turn the motion detector on and off. In the future, I plan on being able to grab images from the camera through the server. 
+This is a python socket server which can easily be connected to using Telnet TCP. I wrote this to have easier access to the meteor-detecting camera. As of now, the server can grab the status of the camera, and turn the motion detector on and off. In the future, I plan on being able to grab images from the camera through the server.
+
+## Server Screenshots
+
+<img width="400" alt="meteor3" src="https://i.imgur.com/gUZgOgb.png">
 
 ## Built With
 
