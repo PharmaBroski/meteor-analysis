@@ -1,4 +1,4 @@
-# Meteor Detector
+# ✨Meteor Detector
 
 This repository contains scripts designed to analyze .mp4 footage and detect meteors. In the current version of the project, the script does not necessarily look for strictly meteors, but movement in general. Future versions of this project can be expected to feature neural networks which scan the footage not for movement but specifically for meteor movement.
 
